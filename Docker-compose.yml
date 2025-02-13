@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile-backend  # Uses backend-specific Dockerfile
+    ports:
+      - "8082:8082"  # Maps backend port
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./Backend:/app  # Syncs backend code with the container
+      - /app/node_modules  # Ensures dependencies don't get overwritten
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Uses frontend-specific Dockerfile
+    ports:
+      - "3000:3000"  # Maps frontend port
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+    depends_on:
+      - backend  # Ensures backend starts first
+    volumes:
+      - .:/app  # Syncs frontend code with the container
+      - /app/node_modules
+    stdin_open: true  # Keeps the frontend container open
+    tty: true
